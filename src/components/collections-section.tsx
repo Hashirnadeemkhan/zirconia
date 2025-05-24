@@ -1,5 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
+import { Suspense } from "react"
 
 interface Collection {
   _id: string;
@@ -10,15 +11,53 @@ interface Collection {
 }
 
 async function getCollections(): Promise<Collection[]> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/collections`, {
-    cache: 'no-store'
-  });
-  
-  if (!res.ok) {
-    throw new Error('Failed to fetch collections');
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/collections`, {
+      cache: 'no-store'
+    });
+    
+    if (!res.ok) {
+      throw new Error('Failed to fetch collections');
+    }
+    
+    return res.json();
+  } catch (error) {
+    console.error('Error fetching collections:', error);
+    return [];
   }
-  
-  return res.json();
+}
+
+function CollectionsGrid({ collections }: { collections: Collection[] }) {
+  if (!collections.length) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-gray-600">No collections available at the moment.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {collections.map((collection) => (
+        <Link key={collection._id} href={`/collections/${collection.slug}`} className="group cursor-pointer">
+          <div className="bg-gray-100 rounded-lg overflow-hidden mb-6 aspect-square">
+            <Image
+              src={collection.image}
+              alt={collection.title}
+              width={400}
+              height={400}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          </div>
+          <div className="text-center">
+            <h3 className="text-xl font-medium text-gray-900 mb-2">{collection.title}</h3>
+            <p className="text-gray-600 mb-2">{collection.description}</p>
+            <div className="w-12 h-px bg-gray-400 mx-auto"></div>
+          </div>
+        </Link>
+      ))}
+    </div>
+  );
 }
 
 export default async function CollectionsSection() {
@@ -32,28 +71,15 @@ export default async function CollectionsSection() {
           <h2 className="text-4xl md:text-5xl font-light text-gray-900 mb-4">Explore the Maisons Collections</h2>
         </div>
 
-        {/* Collections Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {collections.map((collection) => (
-            <Link key={collection._id} href={`/collections/${collection.slug}`} className="group cursor-pointer">
-              <div className="bg-gray-100 rounded-lg overflow-hidden mb-6 aspect-square">
-                <Image
-                  src={collection.image}
-                  alt={collection.title}
-                  width={400}
-                  height={400}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <div className="text-center">
-                <h3 className="text-xl font-medium text-gray-900 mb-2">{collection.title}</h3>
-                <p className="text-gray-600 mb-2">{collection.description}</p>
-                <div className="w-12 h-px bg-gray-400 mx-auto"></div>
-              </div>
-            </Link>
-          ))}
-        </div>
+        {/* Collections Grid with Suspense */}
+        <Suspense fallback={
+          <div className="text-center py-8">
+            <p className="text-gray-600">Loading collections...</p>
+          </div>
+        }>
+          <CollectionsGrid collections={collections} />
+        </Suspense>
       </div>
     </section>
-  )
+  );
 }
