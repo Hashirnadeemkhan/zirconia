@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 import connectDB from '@/lib/db';
 import Collection from '@/models/Collection';
 import Product from '@/models/Product';
@@ -46,11 +47,13 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {products.map((product) => (
               <div key={product._id} className="group">
-                <div className="bg-gray-100 rounded-lg overflow-hidden mb-4 aspect-square">
-                  <img
+                <div className="bg-gray-100 rounded-lg overflow-hidden mb-4 aspect-square relative">
+                  <Image
                     src={product.images[0] || "/placeholder.svg"}
                     alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
                 <div className="space-y-2">
