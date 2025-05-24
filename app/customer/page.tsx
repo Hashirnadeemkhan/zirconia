@@ -1,7 +1,5 @@
 'use client';
 
-import { useUser } from '@clerk/nextjs';
-
 const mockOrders = [
   { id: 1, status: 'Shipped', date: '2023-01-01' },
   { id: 2, status: 'Delivered', date: '2023-01-02' },
@@ -9,25 +7,29 @@ const mockOrders = [
 ];
 
 export default function CustomerPage() {
-  const { user, isLoaded } = useUser();
-
-  if (!isLoaded) return <div>Loading...</div>;
-  if (user?.publicMetadata.role !== 'customer') {
-    return <div>Access Denied</div>;
-  }
-
   return (
-    <div>
-      <h1>Customer Dashboard</h1>
-      <p>Welcome, {user.firstName}!</p>
-      <h2>Order Tracking</h2>
-      <ul>
-        {mockOrders.map((order) => (
-          <li key={order.id}>
-            Order #{order.id} - {order.status} ({order.date})
-          </li>
-        ))}
-      </ul>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">Customer Dashboard</h1>
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-2xl font-semibold mb-4">Order Tracking</h2>
+        <div className="space-y-4">
+          {mockOrders.map((order) => (
+            <div key={order.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div className="flex justify-between items-center">
+                <span className="font-medium">Order #{order.id}</span>
+                <span className={`px-3 py-1 rounded-full text-sm ${
+                  order.status === 'Delivered' ? 'bg-green-100 text-green-800' :
+                  order.status === 'Shipped' ? 'bg-blue-100 text-blue-800' :
+                  'bg-yellow-100 text-yellow-800'
+                }`}>
+                  {order.status}
+                </span>
+              </div>
+              <p className="text-gray-600 mt-2">Date: {order.date}</p>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 } 
