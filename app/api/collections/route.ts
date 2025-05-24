@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import connectDB from "@/lib/db"
 import Collection from "@/models/Collection"
 
+export const runtime = 'nodejs'
+
 export async function GET() {
   try {
     await connectDB()

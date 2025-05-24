@@ -14,8 +14,16 @@ async function connectDB() {
   }
 
   try {
-    await mongoose.connect(MONGODB_URI as string);
+    const options = {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      ssl: true,
+      retryWrites: true,
+    };
+
+    await mongoose.connect(MONGODB_URI as string, options);
     isConnected = true;
+    console.log('MongoDB connected successfully');
   } catch (error) {
     console.error('MongoDB connection error:', error);
     throw error;
