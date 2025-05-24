@@ -1,3 +1,4 @@
+"use client"
 import { useUser } from '@clerk/nextjs';
 import { useState, FormEvent, ChangeEvent, useEffect } from 'react';
 
